@@ -15,7 +15,7 @@ connection.connect(function(err) {
 	startPurchase();
 })
 
-function printItems(res) {
+function listItems(res) {
 	var table = new Table({
 		head: ['Item ID', 'Product Name', 'Department', 'Cost', 'Stock']
 		, colWidths: [10, 50, 30, 10, 10]
@@ -55,7 +55,7 @@ var startPurchase = function() {
 				connection.query('UPDATE products SET ? WHERE item_id = ?', [{ stock_quantity: newQuantity }, item_id]);
 				startPurchase();
 			} else {
-				console.log('Insufficient quantity, please revise quantity.');
+				console.log('Insufficient quantity, please revise.');
 				startPurchase();
 			}
 		})
