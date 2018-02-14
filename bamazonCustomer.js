@@ -17,7 +17,7 @@ connection.connect(function(err) {
 
 function listItems(res) {
 	var table = new Table({
-		head: ['Item ID', 'Product Name', 'Department', 'Cost', 'Stock']
+		head: ['Item ID', 'Product Name', 'Department', 'Cost', 'In Stock']
 		, colWidths: [10, 50, 30, 10, 10]
 	});
 	
@@ -29,7 +29,7 @@ function listItems(res) {
 
 var startPurchase = function() {
 	connection.query('SELECT * FROM products', function(err, res) {
-		printItems(res);
+		listItems(res);
 		var itemsArray = [];
 		for (var i = 0; i < res.length; i++) {
 			itemsArray.push(res[i].product_name);
@@ -44,18 +44,20 @@ var startPurchase = function() {
 			name: 'quantity',
 			type: 'input',
 			message: 'How many would you like to purchase?'
-		}]).then(function(answer) {
-			console.log(answer);
-			var item_id = answer.item;
-			console.log(item_id);
+		}]).then(function(response) {
+			var item_id = response.item;
 			var itemPurchased = res[item_id-1];
-			console.log(itemPurchased);
-			var newQuantity = itemPurchased.stock_quantity - answer.quantity;
+			var productName = itemPurchased.product_name;
+			var totalPrice = itemPurchased.price*response.quantity;
+			console.log(" - Product: " + productName);
+			console.log(" - Item Total: " + totalPrice);
+
+			var newQuantity = itemPurchased.stock_quantity - response.quantity;
 			if (newQuantity >= 0) {
 				connection.query('UPDATE products SET ? WHERE item_id = ?', [{ stock_quantity: newQuantity }, item_id]);
 				startPurchase();
 			} else {
-				console.log('Insufficient quantity, please revise.');
+				console.log('Insufficient quantity, please revise amount.');
 				startPurchase();
 			}
 		})
